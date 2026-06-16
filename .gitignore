@@ -1,0 +1,16 @@
+node_modules/ 
+.env 
+.env.local 
+backend/node_modules/ 
+frontend/node_modules/ 
+backend/.env 
+frontend/.env 
+*.log 
+.DS_Store 
+Thumbs.db 
+dist/ 
+build/ 
+coverage/ 
+.vscode/ 
+.idea/ 
+package-lock.json
