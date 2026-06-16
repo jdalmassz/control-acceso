@@ -18,7 +18,7 @@ app.get('/api/health', (req, res) => {
 
 const frontendPath = path.join(__dirname, '..', 'frontend', 'dist');
 app.use(express.static(frontendPath));
-app.get('*', (req, res) => {
+app.use((req, res) => {
     if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Ruta no encontrada' });
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
