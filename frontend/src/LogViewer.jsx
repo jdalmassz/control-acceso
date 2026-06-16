@@ -25,7 +25,9 @@ function formatDate(iso) {
 
 function useTheme() {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'dark'
+    const saved = localStorage.getItem('theme')
+    if (saved) return saved
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   })
 
   useEffect(() => {

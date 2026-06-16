@@ -5,7 +5,7 @@ module.exports = {
         cwd: __dirname,
         env: {
             NODE_ENV: 'production',
-            PORT: 3001
+            PORT: 4000
         },
         watch: false,
         max_memory_restart: '256M',
