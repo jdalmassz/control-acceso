@@ -23,14 +23,38 @@ function formatDate(iso) {
   })
 }
 
+function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'dark'
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const toggle = () => setTheme(t => t === 'dark' ? 'light' : 'dark')
+  return [theme, toggle]
+}
+
 export default function LogViewer() {
+  const [theme, toggleTheme] = useTheme()
   const [logs, setLogs] = useState([])
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 })
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [userId, setUserId] = useState('')
+  const [users, setUsers] = useState([])
   const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    fetch(`${API}/users`)
+      .then(r => r.json())
+      .then(setUsers)
+      .catch(() => {})
+  }, [])
 
   const fetchLogs = useCallback(async () => {
     setLoading(true)
@@ -39,6 +63,7 @@ export default function LogViewer() {
       if (search) params.append('search', search)
       if (dateFrom) params.append('dateFrom', dateFrom)
       if (dateTo) params.append('dateTo', dateTo)
+      if (userId) params.append('userId', userId)
 
       const res = await fetch(`${API}?${params}`)
       const json = await res.json()
@@ -49,7 +74,7 @@ export default function LogViewer() {
     } finally {
       setLoading(false)
     }
-  }, [page, search, dateFrom, dateTo])
+  }, [page, search, dateFrom, dateTo, userId])
 
   useEffect(() => {
     fetchLogs()
@@ -57,7 +82,7 @@ export default function LogViewer() {
 
   useEffect(() => {
     setPage(1)
-  }, [search, dateFrom, dateTo])
+  }, [search, dateFrom, dateTo, userId])
 
   const today = new Date().toISOString().slice(0, 10)
 
@@ -66,6 +91,9 @@ export default function LogViewer() {
       <header>
         <h1>Control de Acceso</h1>
         <span>{pagination.total.toLocaleString()} registros</span>
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === 'dark' ? '☀️ Claro' : '🌙 Oscuro'}
+        </button>
       </header>
 
       <div className="filters">
@@ -75,6 +103,12 @@ export default function LogViewer() {
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
+        <select value={userId} onChange={e => setUserId(e.target.value)}>
+          <option value="">Todos los usuarios</option>
+          {users.map(u => (
+            <option key={u.ID} value={u.ID}>{u.Name}</option>
+          ))}
+        </select>
         <label>
           Desde:
           <input

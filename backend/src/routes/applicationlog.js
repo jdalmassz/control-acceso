@@ -94,4 +94,19 @@ router.get('/sources', async (req, res) => {
     }
 });
 
+router.get('/users', async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            `SELECT DISTINCT u.ID, u.Name FROM applicationlog log
+             JOIN users u ON log.UserID = u.ID
+             WHERE u.Name IS NOT NULL AND u.Name != ''
+             ORDER BY u.Name`
+        );
+        res.json(rows);
+    } catch (error) {
+        console.error('Error al obtener usuarios:', error);
+        res.status(500).json({ error: 'Error al obtener usuarios' });
+    }
+});
+
 module.exports = router;
